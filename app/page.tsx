@@ -7,6 +7,8 @@ import AttractButton from "@/components/kokonutui/attract-button";
 import CardFlip from "@/components/kokonutui/card-flip";
 import SwitchButton from "@/components/kokonutui/switch-button";
 import { SignedIn, SignedOut, UserButton, useClerk } from "@clerk/nextjs";
+import { useRouter } from "next/navigation";
+import Loader from "@/components/kokonutui/loader";
 
 const page = () => {
   const [isDark, setIsDark] = useState<boolean>(true);
@@ -47,6 +49,62 @@ const page = () => {
   };
 
   const clerk = useClerk();
+  const router = useRouter();
+  const [signInLoading, setSignInLoading] = useState(false);
+  const [signUpLoading, setSignUpLoading] = useState(false);
+  const [enter, setEnter] = useState(false);
+  const signInTimeoutRef = React.useRef<number | null>(null);
+  const signUpTimeoutRef = React.useRef<number | null>(null);
+  const enterTimeoutRef = React.useRef<number | null>(null);
+
+
+  const handleSignIn = () => {
+    setSignInLoading(true);
+    signInTimeoutRef.current = window.setTimeout(() => {
+      setSignInLoading(false);
+      clerk.openSignIn();
+    }, 1500);
+  };
+
+  const handleSignUp = () => {
+    setSignUpLoading(true);
+    signUpTimeoutRef.current = window.setTimeout(() => {
+      setSignUpLoading(false);
+      clerk.openSignUp();
+    }, 1500);
+  };
+
+  const enterdashboard = () => {
+    setEnter(true);
+    signUpTimeoutRef.current = window.setTimeout(() => {
+      setEnter(false);
+      router.push('/dashboard');
+    }, 1500);
+  };
+
+  React.useEffect(() => {
+    return () => {
+      if (signInTimeoutRef.current) {
+        clearTimeout(signInTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  React.useEffect(() => {
+    return () => {
+      if (signUpTimeoutRef.current) {
+        clearTimeout(signUpTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  React.useEffect(() => {
+    return () => {
+      if (enterTimeoutRef.current) {
+        clearTimeout(enterTimeoutRef.current);
+      }
+    };
+  }, []);
 
   return (
     <div>
@@ -62,24 +120,22 @@ const page = () => {
 
         <div className="mt-4 flex items-center gap-3">
           <SignedOut>
-            <AttractButton onClick={() => clerk.openSignIn()}>
-              Sign In
+            <AttractButton onClick={handleSignIn}>
+              {signInLoading ? <Loader title="Signing In..." /> : "Sign In"}
             </AttractButton>
 
-            <AttractButton onClick={() => clerk.openSignUp()}>
-              Sign Up
+            <AttractButton onClick={handleSignUp}>
+              {signUpLoading ? <Loader title="Signing Up..." /> : "Sign Up"}
             </AttractButton>
           </SignedOut>
 
-          <SignedIn>  
-            <AttractButton>Dashboard 
-              <UserButton />
+          <SignedIn>
+            <AttractButton onClick={enterdashboard}>
+              {enter ? <Loader title="Configuring Dashboard..." /> : "Dashboard"}
             </AttractButton>
-            
+            <UserButton />
           </SignedIn>
         </div>
-
-        {/* top-right theme toggle */}
         <div className="absolute top-6 right-6 z-20">
           <SwitchButton onClick={toggleTheme} />
         </div>
