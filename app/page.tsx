@@ -9,6 +9,7 @@ import SwitchButton from "@/components/kokonutui/switch-button";
 import { SignedIn, SignedOut, UserButton, useClerk } from "@clerk/nextjs";
 import { useRouter } from "next/navigation";
 import Loader from "@/components/kokonutui/loader";
+import CardStackExample from "@/components/kokonutui/card-stack";
 
 const page = () => {
   const [isDark, setIsDark] = useState<boolean>(true);
@@ -114,9 +115,9 @@ const page = () => {
           Web Wallet 2.0
         </h1>
 
-        <p className="max-w-2xl text-lg md:text-xl text-neutral-700 dark:text-neutral-300">
+        {/* <p className="max-w-2xl text-lg md:text-xl text-neutral-700 dark:text-neutral-300">
           Your secure and simple payments experience — control your assets with ease.
-        </p>
+        </p> */}
 
         <div className="mt-4 flex items-center gap-3">
           <SignedOut>
@@ -141,9 +142,22 @@ const page = () => {
         </div>
 
         <div className="mt-8 flex flex-row gap-6 items-start justify-center">
-          <CardFlip />
-          <CardFlip />
+          {/* Left card - fixed width so it doesn't shrink */}
+          <div className="flex-none w-[280px]">
+            <CardFlip />
+          </div>
+
+          {/* Card stack - give it a fixed container and allow overflow so stacked cards are visible */}
+          <div className="flex-none w-[420px] md:w-[520px] overflow-visible">
+            <CardStackExample className="mx-auto" />
+          </div>
+
+          {/* Right card - fixed width */}
+          <div className="flex-none w-[280px]">
+            <CardFlip />
+          </div>
         </div>
+        
       </BeamsBackground>
     </div>
   );

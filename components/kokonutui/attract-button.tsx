@@ -31,7 +31,7 @@ interface Particle {
 
 export default function AttractButton({
     className,
-    particleCount = 12,
+    particleCount = 15,
     attractRadius = 50,
     children,
     asChild = false,
@@ -122,7 +122,7 @@ export default function AttractButton({
                         animate={particlesControl}
                         className={cn(
                             "absolute w-1.5 h-1.5 rounded-full",
-                            "bg-violet-400 dark:bg-violet-300",
+                            "bg-green-400 dark:bg-green-300",
                             "transition-opacity duration-300",
                             isAttracting ? "opacity-100" : "opacity-40"
                         )}
