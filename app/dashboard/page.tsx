@@ -189,7 +189,7 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="relative min-h-screen p-6 flex flex-col">
+    <div className="relative min-h-screen p-6 flex flex-col text-base">
       <div className="absolute top-6 right-6 z-20 flex items-center gap-2">
         <div className="w-10 h-10 flex items-center justify-center rounded-md bg-white/5 backdrop-blur-sm dark:bg-black/20">
           <SwitchButton onClick={toggleTheme} aria-label="Toggle theme" />
@@ -204,14 +204,14 @@ export default function DashboardPage() {
   <div className="grid grid-cols-3 gap-6 auto-rows-fr flex-1">
         {/* Left: user details + activity */}
         <div className="flex flex-col h-full gap-4">
-          <div className="p-4 rounded-lg bg-white/5 border border-white/5 flex-3">
-            <h2 className="text-xl font-semibold mb-2">User Details</h2>
+          <div className="p-6 rounded-lg bg-white/5 border border-white/5 flex-3 text-center">
+            <h2 className="text-xl font-semibold mb-4">User Details</h2>
             {userDoc ? (
-              <div className="space-y-1">
-                <div><span className="font-medium">Name: </span>{userDoc.name}</div>
-                <div><span className="font-medium">Bank address: </span>{userDoc.branch}</div>
-                <div><span className="font-medium">Account Balance: </span>₹{userDoc.balance.toFixed(2)}</div>
-                <div><span className="font-medium">VPA ID: </span>{userDoc.vpa}</div>
+              <div className="space-y-3 flex flex-col items-center">
+                <div className="text-2xl md:text-3xl font-extrabold">{userDoc.name}</div>
+                <div className="text-sm text-zinc-400">{userDoc.branch}</div>
+                <div className="text-lg md:text-xl mt-2 text-emerald-400 font-semibold">₹{userDoc.balance.toFixed(2)}</div>
+                <div className="text-sm text-zinc-400 break-all">VPA: <span className="font-mono text-xs">{userDoc.vpa}</span></div>
               </div>
             ) : (
               <div>Loading user...</div>
@@ -230,7 +230,7 @@ export default function DashboardPage() {
         {/* Middle: transactions table and requests table */}
         <div className="col-span-1 flex flex-col h-full gap-4">
           <div className="p-4 rounded-lg bg-white/5 border border-white/5 flex-1 overflow-auto">
-            <h2 className="text-lg font-medium mb-2">Transactions</h2>
+            <h2 className="text-lg font-medium mb-4 text-center">Transactions</h2>
             <table className="w-full text-sm">
               <thead>
                 <tr className="text-left text-zinc-500">
@@ -241,14 +241,14 @@ export default function DashboardPage() {
                 </tr>
               </thead>
               <tbody>
-                {transactions.map((t) => {
+                {transactions.map((t, idx) => {
                   const direction = t.fromVpa === userDoc?.vpa ? "debit" : "credit";
                   const balance = direction === "debit" ? t.balanceAfterFrom : t.balanceAfterTo;
                   return (
-                    <tr key={t.txId} className="border-t">
+                    <tr key={t.txId} className={`border-t ${idx % 2 === 0 ? 'bg-transparent' : 'bg-white/3 dark:bg-black/10'}`}>
                       <td className="py-2">{new Date(t.createdAt).toLocaleString()}</td>
                       <td className="py-2">{direction}</td>
-                      <td className={`py-2 ${direction==="debit"?"text-red-500":"text-green-500"}`}>₹{t.amount.toFixed(2)}</td>
+                      <td className={`py-2 ${direction==="debit"?"text-red-500":"text-emerald-400"}`}>₹{t.amount.toFixed(2)}</td>
                       <td className="py-2">{balance !== undefined ? `₹${balance.toFixed(2)}` : "-"}</td>
                     </tr>
                   );
@@ -258,18 +258,18 @@ export default function DashboardPage() {
           </div>
 
           <div className="p-4 rounded-lg bg-white/5 border border-white/5 flex-1 overflow-auto">
-            <h2 className="text-lg font-medium mb-2">Requests (Incoming)</h2>
+            <h2 className="text-lg font-medium mb-4 text-center">Requests (Incoming)</h2>
             <table className="w-full text-sm">
               <thead>
-                <tr className="text-left text-zinc-500"><th>From VPA</th><th>Amount</th><th>Message</th><th>Action</th></tr>
+                <tr className="text-left text-zinc-500"><th>From VPA</th><th>Amount</th><th>Message</th><th className="text-center">Action</th></tr>
               </thead>
               <tbody>
-                {requests.map((r) => (
-                  <tr key={r._id} className="border-t">
+                {requests.map((r, idx) => (
+                  <tr key={r._id} className={`border-t ${idx % 2 === 0 ? 'bg-transparent' : 'bg-white/3 dark:bg-black/10'}`}>
                     <td className="py-2">{r.fromVpa}</td>
                     <td className="py-2">₹{r.amount.toFixed(2)}</td>
                     <td className="py-2">{r.message}</td>
-                    <td className="py-2"><button className="px-3 py-1 rounded bg-green-600 text-white" onClick={() => fulfillRequest(r._id!)}>Fulfill</button></td>
+                    <td className="py-2 text-center"><button className="inline-block px-3 py-1 rounded bg-green-600 text-white" onClick={() => fulfillRequest(r._id!)}>Fulfill</button></td>
                   </tr>
                 ))}
               </tbody>
@@ -280,24 +280,24 @@ export default function DashboardPage() {
         {/* Right: send and request boxes */}
         <div className="flex flex-col h-full gap-4">
           <div className="p-4 rounded-lg bg-white/5 border border-white/5 flex-1">
-            <h2 className="text-lg font-medium mb-2">Send Money</h2>
-            <div className="space-y-2">
+            <h2 className="text-lg font-semibold mb-4 text-center">Send Money</h2>
+            <div className="space-y-3 max-w-md mx-auto">
               <input className="w-full p-2 rounded bg-transparent border" placeholder="Recipient VPA" value={sendVpa} onChange={(e) => setSendVpa(e.target.value)} />
               <input className="w-full p-2 rounded bg-transparent border" placeholder="Amount" type="number" value={sendAmount as any} onChange={(e) => setSendAmount(e.target.value === "" ? "" : Number(e.target.value))} />
-              <div className="flex justify-end">
-                <button className="px-4 py-2 rounded bg-blue-600 text-white" onClick={doSend}>Send</button>
+              <div className="flex justify-center">
+                <button className="px-6 py-2 rounded bg-blue-600 text-white w-32" onClick={doSend}>Send</button>
               </div>
             </div>
           </div>
 
           <div className="p-4 rounded-lg bg-white/5 border border-white/5 flex-1">
-            <h2 className="text-lg font-medium mb-2">Request Money</h2>
-            <div className="space-y-2">
+            <h2 className="text-lg font-semibold mb-4 text-center">Request Money</h2>
+            <div className="space-y-3 max-w-md mx-auto">
               <input className="w-full p-2 rounded bg-transparent border" placeholder="Recipient VPA" value={reqVpa} onChange={(e) => setReqVpa(e.target.value)} />
               <input className="w-full p-2 rounded bg-transparent border" placeholder="Amount" type="number" value={reqAmount as any} onChange={(e) => setReqAmount(e.target.value === "" ? "" : Number(e.target.value))} />
               <input className="w-full p-2 rounded bg-transparent border" placeholder="Message (optional)" value={reqMessage} onChange={(e) => setReqMessage(e.target.value)} />
-              <div className="flex justify-end">
-                <button className="px-4 py-2 rounded bg-blue-600 text-white" onClick={doRequest}>Request</button>
+              <div className="flex justify-center">
+                <button className="px-6 py-2 rounded bg-blue-600 text-white w-32" onClick={doRequest}>Request</button>
               </div>
             </div>
           </div>
