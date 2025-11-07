@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import SwitchButton from "@/components/kokonutui/switch-button";
 import AppleActivityCard from "@/components/kokonutui/apple-activity-card";
+import ParticleButton from "@/components/kokonutui/particle-button";
 import { UserButton } from "@clerk/nextjs";
 
 type UserDoc = {
@@ -285,7 +286,7 @@ export default function DashboardPage() {
               <input className="w-full p-2 rounded bg-transparent border" placeholder="Recipient VPA" value={sendVpa} onChange={(e) => setSendVpa(e.target.value)} />
               <input className="w-full p-2 rounded bg-transparent border" placeholder="Amount" type="number" value={sendAmount as any} onChange={(e) => setSendAmount(e.target.value === "" ? "" : Number(e.target.value))} />
               <div className="flex justify-center">
-                <button className="px-6 py-2 rounded bg-blue-600 text-white w-32" onClick={doSend}>Send</button>
+                <ParticleButton onClick={doSend} className="px-6 py-2 rounded bg-emerald-500 hover:bg-emerald-600 text-white w-32">Send</ParticleButton>
               </div>
             </div>
           </div>
@@ -297,7 +298,7 @@ export default function DashboardPage() {
               <input className="w-full p-2 rounded bg-transparent border" placeholder="Amount" type="number" value={reqAmount as any} onChange={(e) => setReqAmount(e.target.value === "" ? "" : Number(e.target.value))} />
               <input className="w-full p-2 rounded bg-transparent border" placeholder="Message (optional)" value={reqMessage} onChange={(e) => setReqMessage(e.target.value)} />
               <div className="flex justify-center">
-                <button className="px-6 py-2 rounded bg-blue-600 text-white w-32" onClick={doRequest}>Request</button>
+                <ParticleButton onClick={doRequest} className="px-6 py-2 rounded bg-emerald-500 hover:bg-emerald-600 text-white w-32">Request</ParticleButton>
               </div>
             </div>
           </div>
