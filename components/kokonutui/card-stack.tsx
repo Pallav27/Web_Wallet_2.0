@@ -33,12 +33,12 @@ const products: Product[] = [
         id: "instant-pay",
         title: "Quick Pay",
         subtitle: "Instant Transfers",
-        image: "https://www.freepik.com/free-vector/flat-woman-paying-by-pos-terminal-refund-cashback_22510936.htm#fromView=keyword&page=1&position=20&uuid=d6621a00-47c4-45e2-b5b1-58a0edb88f36&query=Payment+cartoon",
+        image: '/money.jpg',
         specs: [
             { label: "Speed", value: "Instant" },
             { label: "Security", value: "256-bit" },
-            { label: "Limit", value: "$50,000" },
-            { label: "Fee", value: "0.5%" },
+            { label: "Reliability", value: "High" },
+            { label: "Performance", value: "Best" },
         ],
     },
     {
@@ -210,6 +210,15 @@ const Card = ({ product, index, totalCards, isExpanded }: CardProps) => {
                         alt={product.title}
                         className="object-cover w-full h-full"
                         loading="lazy"
+                        decoding="async"
+                        onError={(e) => {
+                            // fallback to a safe Unsplash image if the provided src fails
+                            try {
+                                (e.currentTarget as HTMLImageElement).src = "https://images.unsplash.com/photo-1527443224154-c4a3942d3acf?w=800&auto=format&fit=crop&q=80";
+                            } catch (err) {
+                                // no-op
+                            }
+                        }}
                     />
                 </div>
 

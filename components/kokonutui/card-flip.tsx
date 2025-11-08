@@ -25,7 +25,7 @@ export default function CardFlip({
     title = "Design Systems",
     subtitle = "Explore the fundamentals",
     description = "Dive deep into the world of modern UI/UX design.",
-    features = ["UI/UX", "Modern Design", "Tailwind CSS", "Kokonut UI"],
+    features = ["VPA-Based Requests", "Instant Settlements", "Integrated History", "Best Performance"],
 }: CardFlipProps) {
     const [isFlipped, setIsFlipped] = useState(false);
 

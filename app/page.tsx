@@ -144,7 +144,13 @@ const page = () => {
         <div className="mt-8 flex flex-row gap-6 items-start justify-center">
           {/* Left card - fixed width so it doesn't shrink */}
           <div className="flex-none w-[280px]">
-            <CardFlip />
+            <CardFlip 
+            title="Scan & Pay"
+            subtitle="Simplify payments"
+            description="Pay or receive money instantly by scanning a secure QR code.
+No manual entry, no delays — just tap, scan, and go."
+
+            />
           </div>
 
           {/* Card stack - give it a fixed container and allow overflow so stacked cards are visible */}
@@ -154,7 +160,14 @@ const page = () => {
 
           {/* Right card - fixed width */}
           <div className="flex-none w-[280px]">
-            <CardFlip />
+            <CardFlip 
+            
+              title="Request Money"
+            subtitle="Smart & seamless"
+            description="Send or receive payment requests directly using a VPA ID.
+Get notified in real time when your request is accepted or declined."
+
+            />
           </div>
         </div>
         
