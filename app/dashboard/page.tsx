@@ -215,10 +215,10 @@ export default function DashboardPage() {
   return (
     <div className="relative min-h-screen p-6 flex flex-col text-base">
       <div className="absolute top-6 right-6 z-20 flex items-center gap-2">
-        <div className="w-10 h-10 flex items-center justify-center rounded-md bg-white/5 backdrop-blur-sm dark:bg-black/20">
+        <div className="w-10 h-10 flex items-center justify-center rounded-md bg-gray-50 dark:bg-black/20 border border-gray-200/60">
           <SwitchButton onClick={toggleTheme} aria-label="Toggle theme" />
         </div>
-        <div className="w-10 h-10 flex items-center justify-center rounded-md bg-white/5 backdrop-blur-sm dark:bg-black/20">
+  <div className="w-10 h-10 flex items-center justify-center rounded-md bg-gray-50 dark:bg-black/20 border border-gray-200/60">
           <UserButton />
         </div>
       </div>
@@ -229,7 +229,7 @@ export default function DashboardPage() {
         {/* Left: user details + activity */}
         <div className="flex flex-col h-full gap-4">
           {/* make user card a fixed-height panel so it doesn't consume remaining space */}
-          <div className="p-6 rounded-lg bg-white/5 border border-white/5 text-center flex-none h-64 md:h-72 lg:h-80 flex flex-col justify-center">
+          <div className="p-6 rounded-lg bg-gray-50 border border-gray-200 dark:bg-white/5 dark:border-white/5 text-center flex-none h-64 md:h-72 lg:h-80 flex flex-col justify-center">
             <h2 className="text-xl font-semibold mb-4">User Details</h2>
             {userDoc ? (
                 <div className="space-y-3 flex flex-col items-center">
@@ -258,7 +258,7 @@ export default function DashboardPage() {
 
         {/* Middle: transactions table and requests table */}
         <div className="col-span-1 flex flex-col h-full gap-4">
-          <div className="p-4 rounded-lg bg-white/5 border border-white/5 flex-1 overflow-auto">
+          <div className="p-4 rounded-lg bg-gray-50 border border-gray-200 dark:bg-white/5 dark:border-white/5 flex-1 overflow-auto">
             <h2 className="text-lg font-medium mb-4 text-center">Transactions</h2>
             <table className="w-full text-sm">
               <thead>
@@ -283,7 +283,7 @@ export default function DashboardPage() {
             </table>
           </div>
 
-          <div className="p-4 rounded-lg bg-white/5 border border-white/5 flex-1 overflow-auto">
+          <div className="p-4 rounded-lg bg-gray-50 border border-gray-200 dark:bg-white/5 dark:border-white/5 flex-1 overflow-auto">
             <h2 className="text-lg font-medium mb-4 text-center">Requests (Incoming)</h2>
             <table className="w-full text-sm">
               <thead>
@@ -305,7 +305,7 @@ export default function DashboardPage() {
 
         {/* Right: send and request boxes */}
         <div className="flex flex-col h-full gap-4">
-          <div className="p-4 rounded-lg bg-white/5 border border-white/5 flex-1">
+          <div className="p-4 rounded-lg bg-gray-50 border border-gray-200 dark:bg-white/5 dark:border-white/5 flex-1">
             <h2 className="text-lg font-semibold mb-4 text-center">Send Money</h2>
             <div className="space-y-3 max-w-md mx-auto">
               <input className="w-full p-2 rounded bg-transparent border" placeholder="Recipient VPA" value={sendVpa} onChange={(e) => setSendVpa(e.target.value)} />
@@ -316,7 +316,7 @@ export default function DashboardPage() {
             </div>
           </div>
 
-          <div className="p-4 rounded-lg bg-white/5 border border-white/5 flex-1">
+          <div className="p-4 rounded-lg bg-gray-50 border border-gray-200 dark:bg-white/5 dark:border-white/5 flex-1">
             <h2 className="text-lg font-semibold mb-4 text-center">Request Money</h2>
             <div className="space-y-3 max-w-md mx-auto">
               <input className="w-full p-2 rounded bg-transparent border" placeholder="Recipient VPA" value={reqVpa} onChange={(e) => setReqVpa(e.target.value)} />
