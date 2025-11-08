@@ -234,10 +234,10 @@ export default function DashboardPage() {
             {userDoc ? (
                 <div className="space-y-3 flex flex-col items-center">
                 <div className="text-2xl md:text-3xl font-extrabold">{userDoc.name}</div>
-                <div className="text-sm text-zinc-400">{userDoc.branch}</div>
+              
                 <div className="text-lg md:text-xl mt-2 text-emerald-400 font-semibold">₹{userDoc.balance.toFixed(2)}</div>
                 <div className="text-sm text-zinc-400 break-all">VPA: <span className="font-mono text-xs">{userDoc.vpa}</span></div>
-                <div className="mt-3">
+                <div className="mt-3 mb-6">
                   {/* QR code for VPA - when scanned yields the VPA string */}
                   <QRCodeCanvas value={userDoc.vpa} size={96} bgColor="transparent" fgColor="#34D399" level="M" />
                 </div>
