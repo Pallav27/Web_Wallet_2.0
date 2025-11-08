@@ -228,7 +228,8 @@ export default function DashboardPage() {
   <div className="grid grid-cols-3 gap-6 auto-rows-fr flex-1">
         {/* Left: user details + activity */}
         <div className="flex flex-col h-full gap-4">
-          <div className="p-6 rounded-lg bg-white/5 border border-white/5 flex-3 text-center">
+          {/* make user card a fixed-height panel so it doesn't consume remaining space */}
+          <div className="p-6 rounded-lg bg-white/5 border border-white/5 text-center flex-none h-64 md:h-72 lg:h-80 flex flex-col justify-center">
             <h2 className="text-xl font-semibold mb-4">User Details</h2>
             {userDoc ? (
                 <div className="space-y-3 flex flex-col items-center">
@@ -238,7 +239,7 @@ export default function DashboardPage() {
                 <div className="text-sm text-zinc-400 break-all">VPA: <span className="font-mono text-xs">{userDoc.vpa}</span></div>
                 <div className="mt-3">
                   {/* QR code for VPA - when scanned yields the VPA string */}
-                  <QRCodeCanvas value={userDoc.vpa} size={120} bgColor="transparent" fgColor="#34D399" level="M" />
+                  <QRCodeCanvas value={userDoc.vpa} size={96} bgColor="transparent" fgColor="#34D399" level="M" />
                 </div>
               </div>
             ) : (

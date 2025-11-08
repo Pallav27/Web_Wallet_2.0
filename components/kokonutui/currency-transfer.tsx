@@ -484,8 +484,7 @@ export default function CurrencyTransfer({
                                                                     ],
                                                                 }}
                                                             >
-                                                                Deutsche Bank
-                                                                ••••7823
+                                                                {toVpa}
                                                             </motion.span>
                                                         </div>
                                                     </motion.div>
@@ -517,7 +516,7 @@ export default function CurrencyTransfer({
                                                 ease: [0.22, 1, 0.36, 1],
                                             }}
                                         >
-                                            Exchange Rate: 1 USD = 0.92 EUR
+                                            Payment Confirmed
                                         </motion.span>
                                     ) : (
                                         <motion.span
@@ -530,7 +529,7 @@ export default function CurrencyTransfer({
                                                 ease: [0.22, 1, 0.36, 1],
                                             }}
                                         >
-                                            Calculating exchange rate...
+                                            Confirming Payment Status
                                         </motion.span>
                                     )}
                                 </AnimatePresence>
