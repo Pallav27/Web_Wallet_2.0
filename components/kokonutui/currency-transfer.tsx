@@ -25,7 +25,7 @@ import {
     TooltipProvider,
     TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { cn } from "@/lib/utils";
 
 interface CheckmarkProps {
@@ -100,23 +100,80 @@ export function Checkmark({
     );
 }
 
-export default function CurrencyTransfer() {
+interface CurrencyTransferProps {
+    open?: boolean;
+    fromVpa?: string;
+    toVpa?: string;
+    amount?: number | string;
+    mode?: "send" | "request";
+    onClose?: () => void;
+    onConfirm?: () => Promise<{ success: boolean; txId?: string; error?: string }>;
+}
+
+export default function CurrencyTransfer({
+    open = true,
+    fromVpa = "",
+    toVpa = "",
+    amount = 0,
+    mode = "send",
+    onClose,
+    onConfirm,
+}: CurrencyTransferProps) {
     const [isCompleted, setIsCompleted] = useState(false);
-    const transactionId = "TXN-DAB3UL494";
+    const [processing, setProcessing] = useState(false);
+    const [transactionId, setTransactionId] = useState<string | null>(null);
+    const confirmStartedRef = useRef(false);
 
     useEffect(() => {
-        const timer = setTimeout(() => {
-            setIsCompleted(true);
-        }, 1500);
+        if (!open) {
+            setIsCompleted(false);
+            setProcessing(false);
+            setTransactionId(null);
+        }
+    }, [open]);
 
-        return () => clearTimeout(timer);
-    }, []);
+    // Confirm handler: call onConfirm and ensure the loading UI shows for 2.5s
+    const handleConfirm = async () => {
+        const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+        try {
+            setProcessing(true);
+            if (onConfirm) {
+                const resPromise = onConfirm();
+                // wait for both the action and a minimum 2.5s loading
+                const [res] = await Promise.all([resPromise, sleep(2500)]);
+                if (res?.txId) setTransactionId(res.txId);
+            } else {
+                // no handler: just show the loading for 2.5s
+                await sleep(2500);
+            }
+            setIsCompleted(true);
+
+            // auto-close after a short delay so user sees success briefly
+            setTimeout(() => {
+                if (onClose) onClose();
+            }, 600);
+        } catch (err) {
+            console.error(err);
+        } finally {
+            setProcessing(false);
+        }
+    };
+
+    // auto-trigger confirm when the modal opens
+    useEffect(() => {
+        if (open && !processing && !isCompleted && !confirmStartedRef.current) {
+            confirmStartedRef.current = true;
+            handleConfirm();
+        }
+        if (!open) confirmStartedRef.current = false;
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [open]);
 
     return (
         <TooltipProvider>
             <Card className="w-full max-w-sm mx-auto p-6 h-[420px] flex flex-col bg-white dark:bg-zinc-900 border border-zinc-200/60 dark:border-zinc-800/60 backdrop-blur-sm shadow-[0_0_0_1px_rgba(0,0,0,0.03)] dark:shadow-[0_0_0_1px_rgba(255,255,255,0.03)] hover:border-emerald-500/20 dark:hover:border-emerald-500/20 transition-all duration-500">
                 <CardContent className="flex-1 flex flex-col justify-center space-y-4">
-                    <div className="h-[80px] flex items-center justify-center">
+                    <div className="h-20 flex items-center justify-center">
                         <motion.div
                             className="flex justify-center"
                             initial={{ opacity: 0, y: -10 }}
@@ -310,129 +367,7 @@ export default function CurrencyTransfer() {
                                             ease: [0.32, 0.72, 0, 1],
                                         }}
                                     >
-                                        <motion.div
-                                            className={cn(
-                                                "w-full bg-zinc-50 dark:bg-zinc-800/50 rounded-xl p-2.5 border border-zinc-200 dark:border-zinc-700/50 backdrop-blur-md transition-all duration-300",
-                                                isCompleted
-                                                    ? "rounded-b-none border-b-0"
-                                                    : "hover:border-emerald-500/30"
-                                            )}
-                                            animate={{
-                                                y: 0,
-                                                scale: 1,
-                                            }}
-                                            transition={{
-                                                duration: 0.6,
-                                                ease: [0.32, 0.72, 0, 1],
-                                            }}
-                                        >
-                                            <div className="space-y-1 w-full">
-                                                <motion.span
-                                                    className="text-xs font-medium text-zinc-500 dark:text-zinc-400 flex items-center gap-1.5"
-                                                    initial={{ opacity: 1 }}
-                                                    animate={{ opacity: 1 }}
-                                                    transition={{
-                                                        duration: 0.3,
-                                                        ease: [
-                                                            0.22, 1, 0.36, 1,
-                                                        ],
-                                                    }}
-                                                >
-                                                    <ArrowUpIcon className="w-3 h-3" />
-                                                    From
-                                                </motion.span>
-                                                <div className="flex flex-col gap-1.5">
-                                                    <motion.div
-                                                        className="flex items-center gap-2.5 group"
-                                                        initial={{ opacity: 1 }}
-                                                        animate={{ opacity: 1 }}
-                                                        transition={{
-                                                            duration: 0.3,
-                                                            ease: [
-                                                                0.22, 1, 0.36,
-                                                                1,
-                                                            ],
-                                                        }}
-                                                    >
-                                                        <motion.span
-                                                            className="inline-flex items-center justify-center w-7 h-7 rounded-lg bg-white dark:bg-zinc-900 shadow-lg border border-zinc-300 dark:border-zinc-700 text-sm font-medium text-zinc-900 dark:text-zinc-100 transition-colors duration-300"
-                                                            whileHover={{
-                                                                scale: 1.05,
-                                                            }}
-                                                            transition={{
-                                                                type: "spring",
-                                                                stiffness: 400,
-                                                                damping: 10,
-                                                            }}
-                                                        >
-                                                            $
-                                                        </motion.span>
-                                                        <div className="flex flex-col items-start">
-                                                            <AnimatePresence mode="wait">
-                                                                <motion.span
-                                                                    key={
-                                                                        isCompleted
-                                                                            ? "completed-amount"
-                                                                            : "processing-amount"
-                                                                    }
-                                                                    className={cn(
-                                                                        "font-medium text-zinc-900 dark:text-zinc-100 tracking-tight"
-                                                                    )}
-                                                                    initial={{
-                                                                        opacity:
-                                                                            isCompleted
-                                                                                ? 1
-                                                                                : 0.5,
-                                                                    }}
-                                                                    animate={{
-                                                                        opacity:
-                                                                            isCompleted
-                                                                                ? 1
-                                                                                : 0.5,
-                                                                    }}
-                                                                    exit={{
-                                                                        opacity:
-                                                                            isCompleted
-                                                                                ? 1
-                                                                                : 0.5,
-                                                                    }}
-                                                                    transition={{
-                                                                        duration: 0.3,
-                                                                        ease: [
-                                                                            0.22,
-                                                                            1,
-                                                                            0.36,
-                                                                            1,
-                                                                        ],
-                                                                    }}
-                                                                >
-                                                                    500.00 USD
-                                                                </motion.span>
-                                                            </AnimatePresence>
-                                                            <motion.span
-                                                                className="text-xs text-zinc-500 dark:text-zinc-400"
-                                                                initial={{
-                                                                    opacity: 1,
-                                                                }}
-                                                                animate={{
-                                                                    opacity: 1,
-                                                                }}
-                                                                transition={{
-                                                                    duration: 0.3,
-                                                                    ease: [
-                                                                        0.22, 1,
-                                                                        0.36, 1,
-                                                                    ],
-                                                                }}
-                                                            >
-                                                                Chase Bank
-                                                                ••••4589
-                                                            </motion.span>
-                                                        </div>
-                                                    </motion.div>
-                                                </div>
-                                            </div>
-                                        </motion.div>
+                                        {/* Removed `From` section - only show destination and amount */}
 
                                         <motion.div
                                             className={cn(
@@ -530,7 +465,7 @@ export default function CurrencyTransfer() {
                                                                         ],
                                                                     }}
                                                                 >
-                                                                    460.00 EUR
+                                                                    {typeof amount === 'number' ? `₹${Number(amount).toFixed(2)}` : amount}
                                                                 </motion.span>
                                                             </AnimatePresence>
                                                             <motion.span
@@ -612,6 +547,7 @@ export default function CurrencyTransfer() {
                                     </TooltipContent>
                                 </Tooltip>
                             </motion.div>
+                            {/* Auto-processing modal — no manual confirm button. Processing starts when opened. */}
                         </motion.div>
                     </div>
                 </CardContent>

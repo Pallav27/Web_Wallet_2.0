@@ -5,6 +5,7 @@ import { useUser } from "@clerk/nextjs";
 import SwitchButton from "@/components/kokonutui/switch-button";
 import AppleActivityCard from "@/components/kokonutui/apple-activity-card";
 import ParticleButton from "@/components/kokonutui/particle-button";
+import CurrencyTransfer from "@/components/kokonutui/currency-transfer";
 import { UserButton } from "@clerk/nextjs";
 
 type UserDoc = {
@@ -134,44 +135,27 @@ export default function DashboardPage() {
   const [reqVpa, setReqVpa] = useState("");
   const [reqAmount, setReqAmount] = useState<number | "">("");
   const [reqMessage, setReqMessage] = useState("");
+  const [transferOpen, setTransferOpen] = useState(false);
+  const [transferMode, setTransferMode] = useState<"send" | "request">("send");
+  const [transferTo, setTransferTo] = useState("");
+  const [transferAmount, setTransferAmount] = useState<number | string>("");
 
   const doSend = async () => {
     if (!sendVpa || !sendAmount) return;
-    setLoading(true);
-    try {
-      const res = await fetch("/api/transfer", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ toVpa: sendVpa, amount: Number(sendAmount) }) });
-      const j = await res.json();
-      if (j?.success) {
-        await refreshData();
-        setSendVpa("");
-        setSendAmount("");
-      } else {
-        alert(j?.error || "Transfer failed");
-      }
-    } catch (e) {
-      console.error(e);
-      alert("Transfer error");
-    } finally { setLoading(false); }
+    // open currency transfer modal in send mode
+    setTransferMode("send");
+    setTransferTo(sendVpa);
+    setTransferAmount(sendAmount as number | string);
+    setTransferOpen(true);
   };
 
   const doRequest = async () => {
     if (!reqVpa || !reqAmount) return;
-    setLoading(true);
-    try {
-      const res = await fetch("/api/requests", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ toVpa: reqVpa, amount: Number(reqAmount), message: reqMessage }) });
-      const j = await res.json();
-      if (j?.request) {
-        await refreshData();
-        setReqVpa("");
-        setReqAmount("");
-        setReqMessage("");
-      } else {
-        alert(j?.error || "Request failed");
-      }
-    } catch (e) {
-      console.error(e);
-      alert("Request error");
-    } finally { setLoading(false); }
+    // open currency transfer modal in request mode
+    setTransferMode("request");
+    setTransferTo(reqVpa);
+    setTransferAmount(reqAmount as number | string);
+    setTransferOpen(true);
   };
 
   const fulfillRequest = async (id: string) => {
@@ -187,6 +171,44 @@ export default function DashboardPage() {
       }
     } catch (e) { console.error(e); alert("Fulfill error"); }
     finally { setLoading(false); }
+  };
+
+  const handleConfirmTransfer = async () => {
+    // depending on mode, call transfer or request endpoint
+    if (!userDoc) return { success: false };
+    try {
+      setLoading(true);
+        if (transferMode === "send") {
+        const res = await fetch("/api/transfer", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ toVpa: transferTo, amount: Number(transferAmount) }) });
+        const j = await res.json();
+        if (j?.success) {
+          await refreshData();
+          setSendVpa("");
+          setSendAmount("");
+          return { success: true, txId: j.txId };
+        } else {
+          alert(j?.error || "Transfer failed");
+          return { success: false, error: j?.error };
+        }
+      } else {
+        const res = await fetch("/api/requests", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ toVpa: transferTo, amount: Number(transferAmount), message: reqMessage }) });
+        const j = await res.json();
+        if (j?.request) {
+          await refreshData();
+          setReqVpa("");
+          setReqAmount("");
+          setReqMessage("");
+          return { success: true };
+        } else {
+          alert(j?.error || "Request failed");
+          return { success: false, error: j?.error };
+        }
+      }
+    } catch (e) {
+      console.error(e);
+      alert("Action failed");
+      return { success: false, error: String(e) };
+    } finally { setLoading(false); }
   };
 
   return (
@@ -301,6 +323,23 @@ export default function DashboardPage() {
           </div>
         </div>
       </div>
+      {/* Currency Transfer Modal (centered) */}
+      {transferOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div className="absolute inset-0 bg-black/50" onClick={() => setTransferOpen(false)} />
+          <div className="relative z-50">
+            <CurrencyTransfer
+              open={transferOpen}
+              fromVpa={userDoc?.vpa}
+              toVpa={transferTo}
+              amount={transferAmount}
+              mode={transferMode}
+              onClose={() => setTransferOpen(false)}
+              onConfirm={handleConfirmTransfer}
+            />
+          </div>
+        </div>
+      )}
     </div>
   );
 }

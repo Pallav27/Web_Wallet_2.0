@@ -34,50 +34,73 @@ export async function POST(req: Request) {
     const recipient = await User.findOne({ vpa: toVpa });
     if (!recipient) return NextResponse.json({ error: "Recipient not found" }, { status: 404 });
 
-    // Start mongoose transaction
-    const session = await User.db.startSession();
-    session.startTransaction();
-    try {
-      // reload with session and optimistic checks
-      const s = await User.findById(sender._id).session(session).exec();
-      const r = await User.findById(recipient._id).session(session).exec();
+    // Start mongoose transaction with retry for transient write conflicts
+    const maxRetries = 4;
+    const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-      if (!s || !r) throw new Error("Accounts disappeared");
+    function isTransientError(e: any) {
+      if (!e) return false;
+      try {
+        if (typeof e.hasErrorLabel === "function" && e.hasErrorLabel("TransientTransactionError")) return true;
+        if (Array.isArray(e.errorLabels) && e.errorLabels.includes("TransientTransactionError")) return true;
+        if (e.code === 112) return true; // WriteConflict
+        if (typeof e.message === "string" && e.message.toLowerCase().includes("write conflict")) return true;
+      } catch (err) {}
+      return false;
+    }
 
-      if (s.balance < amount) {
+    for (let attempt = 0; attempt <= maxRetries; attempt++) {
+      const session = await User.db.startSession();
+      session.startTransaction();
+      try {
+        // reload with session and optimistic checks
+        const s = await User.findById(sender._id).session(session).exec();
+        const r = await User.findById(recipient._id).session(session).exec();
+
+        if (!s || !r) throw new Error("Accounts disappeared");
+
+        if (s.balance < amount) {
+          await session.abortTransaction();
+          session.endSession();
+          return NextResponse.json({ error: "Insufficient funds" }, { status: 400 });
+        }
+
+        s.balance = +(s.balance - amount).toFixed(2);
+        r.balance = +(r.balance + amount).toFixed(2);
+
+        await s.save({ session });
+        await r.save({ session });
+
+        const tx = await Transaction.create([
+          {
+            txId: makeTxId(),
+            fromVpa: s.vpa,
+            toVpa: r.vpa,
+            amount,
+            status: "completed",
+            createdAt: new Date(),
+            balanceAfterFrom: s.balance,
+            balanceAfterTo: r.balance,
+          },
+        ], { session });
+
+        await session.commitTransaction();
+        session.endSession();
+
+        return NextResponse.json({ success: true, transaction: tx[0] }, { status: 200 });
+      } catch (err: any) {
         await session.abortTransaction();
         session.endSession();
-        return NextResponse.json({ error: "Insufficient funds" }, { status: 400 });
+        // if transient, retry with backoff
+        if (isTransientError(err) && attempt < maxRetries) {
+          console.warn(`Transient transaction error, retrying (${attempt + 1}/${maxRetries})`, err?.message ?? err);
+          await sleep(100 * Math.pow(2, attempt));
+          continue;
+        }
+        console.error("Transfer transaction failed:", err);
+        // return a friendly error message rather than raw DB internals
+        return NextResponse.json({ error: "Temporary conflict or server error — please try again." }, { status: 503 });
       }
-
-      s.balance = +(s.balance - amount).toFixed(2);
-      r.balance = +(r.balance + amount).toFixed(2);
-
-      await s.save({ session });
-      await r.save({ session });
-
-      const tx = await Transaction.create([
-        {
-          txId: makeTxId(),
-          fromVpa: s.vpa,
-          toVpa: r.vpa,
-          amount,
-          status: "completed",
-          createdAt: new Date(),
-          balanceAfterFrom: s.balance,
-          balanceAfterTo: r.balance,
-        },
-      ], { session });
-
-      await session.commitTransaction();
-      session.endSession();
-
-      return NextResponse.json({ success: true, transaction: tx[0] }, { status: 200 });
-    } catch (err) {
-      await session.abortTransaction();
-      session.endSession();
-      console.error(err);
-      return NextResponse.json({ error: err instanceof Error ? err.message : String(err) }, { status: 500 });
     }
   } catch (err: any) {
     console.error(err);
