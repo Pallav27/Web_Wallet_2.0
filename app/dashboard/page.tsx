@@ -238,19 +238,16 @@ export default function DashboardPage() {
                   <th>Date</th>
                   <th>Type</th>
                   <th>Amount</th>
-                  <th>Balance</th>
                 </tr>
               </thead>
               <tbody>
                 {transactions.map((t, idx) => {
                   const direction = t.fromVpa === userDoc?.vpa ? "debit" : "credit";
-                  const balance = direction === "debit" ? t.balanceAfterFrom : t.balanceAfterTo;
                   return (
                     <tr key={t.txId} className={`border-t ${idx % 2 === 0 ? 'bg-transparent' : 'bg-white/3 dark:bg-black/10'}`}>
                       <td className="py-2">{new Date(t.createdAt).toLocaleString()}</td>
                       <td className="py-2">{direction}</td>
                       <td className={`py-2 ${direction==="debit"?"text-red-500":"text-emerald-400"}`}>₹{t.amount.toFixed(2)}</td>
-                      <td className="py-2">{balance !== undefined ? `₹${balance.toFixed(2)}` : "-"}</td>
                     </tr>
                   );
                 })}
