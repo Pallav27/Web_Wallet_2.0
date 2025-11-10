@@ -215,10 +215,10 @@ export default function DashboardPage() {
   return (
     <div className="relative min-h-screen p-4 flex flex-col text-base">
       <div className="absolute top-6 right-6 z-20 flex items-center gap-2">
-        <div className="w-10 h-10 flex items-center justify-center rounded-md bg-gray-50 dark:bg-black/20 border border-gray-200/60">
+        <div className="w-10 h-10 px-10 flex items-center justify-center rounded-md bg-gray-50 dark:bg-black/20 border border-gray-200/60">
           <SwitchButton onClick={toggleTheme} aria-label="Toggle theme" />
         </div>
-  <div className="w-10 h-10 flex items-center justify-center rounded-md bg-gray-50 dark:bg-black/20 border border-gray-200/60">
+  <div className="w-10 h-10 px-10 flex items-center justify-center rounded-md bg-gray-50 dark:bg-black/20 border border-gray-200/60">
           <UserButton />
         </div>
       </div>
