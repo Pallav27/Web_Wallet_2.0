@@ -213,33 +213,32 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="relative min-h-screen p-6 flex flex-col text-base">
+    <div className="relative min-h-screen p-4 flex flex-col text-base">
       <div className="absolute top-6 right-6 z-20 flex items-center gap-2">
-        <div className="w-10 h-10 px-10 flex items-center justify-center rounded-md bg-gray-50 dark:bg-black/20 border border-gray-200/60">
+        <div className="w-10 h-10 flex items-center justify-center rounded-md bg-gray-50 dark:bg-black/20 border border-gray-200/60">
           <SwitchButton onClick={toggleTheme} aria-label="Toggle theme" />
         </div>
-  <div className="w-10 h-10 px-10 flex items-center justify-center rounded-md bg-gray-50 dark:bg-black/20 border border-gray-200/60">
+  <div className="w-10 h-10 flex items-center justify-center rounded-md bg-gray-50 dark:bg-black/20 border border-gray-200/60">
           <UserButton />
         </div>
       </div>
 
-      <h1 className="text-3xl font-bold mb-6">Dashboard</h1>
+      <h1 className="text-3xl font-bold mb-4">Dashboard</h1>
 
-  <div className="grid grid-cols-3 gap-6 auto-rows-fr flex-1">
+  <div className="grid grid-cols-3 gap-2 auto-rows-fr flex-1">
         {/* Left: user details + activity */}
         <div className="flex flex-col h-full gap-4">
-          {/* make user card a fixed-height panel so it doesn't consume remaining space */}
-          <div className="p-6 rounded-lg bg-gray-50 border border-gray-200 dark:bg-white/5 dark:border-white/5 text-center flex-none h-64 md:h-72 lg:h-80 flex flex-col justify-center">
+          {/* User Details card (fixed height to avoid excess whitespace) */}
+          <div className="p-4 rounded-lg bg-gray-50 border border-gray-200 dark:bg-white/5 dark:border-white/5 text-center flex-none h-80 md:h-96 lg:h-96 flex flex-col justify-center">
             <h2 className="text-xl font-semibold mb-4">User Details</h2>
             {userDoc ? (
-                <div className="space-y-3 flex flex-col items-center">
+              <div className="space-y-3 flex flex-col items-center">
                 <div className="text-2xl md:text-3xl font-extrabold">{userDoc.name}</div>
-              
                 <div className="text-lg md:text-xl mt-2 text-emerald-400 font-semibold">₹{userDoc.balance.toFixed(2)}</div>
                 <div className="text-sm text-zinc-400 break-all">VPA: <span className="font-mono text-xs">{userDoc.vpa}</span></div>
-                <div className="mt-3 mb-6">
+                <div className="mt-3 mb-4">
                   {/* QR code for VPA - when scanned yields the VPA string */}
-                  <QRCodeCanvas value={userDoc.vpa} size={96} bgColor="transparent" fgColor="#34D399" level="M" />
+                  <QRCodeCanvas value={userDoc.vpa} size={132} bgColor="transparent" fgColor="#34D399" level="M" />
                 </div>
               </div>
             ) : (
@@ -247,7 +246,7 @@ export default function DashboardPage() {
             )}
           </div>
 
-          <div className="flex-1">
+            <div className="flex-none h-60 md:h-60 lg:h-60">
             <AppleActivityCard title="Activity Rings" activities={[
               { label: "DEBITS", value: debitSum ? Math.min(100, (debitSum/Math.max(1,total))*100) : 0, color: "#FF2D55", size: 200, current: Math.round(debitSum), target: Math.round(total || 1), unit: "₹" },
               { label: "CREDITS", value: creditSum ? Math.min(100, (creditSum/Math.max(1,total))*100) : 0, color: "#A3F900", size: 160, current: Math.round(creditSum), target: Math.round(total || 1), unit: "₹" },
