@@ -297,7 +297,7 @@ export default function CurrencyTransfer({
                                             ease: [0.22, 1, 0.36, 1],
                                         }}
                                     >
-                                        Transfer Completed
+                                        {mode === "request" ? "Request Sent" : "Transfer Completed"}
                                     </motion.h2>
                                 ) : (
                                     <motion.h2
@@ -311,7 +311,7 @@ export default function CurrencyTransfer({
                                             ease: [0.22, 1, 0.36, 1],
                                         }}
                                     >
-                                        Transfer in Progress
+                                        {mode === "request" ? "Requesting Money" : "Transfer in Progress"}
                                     </motion.h2>
                                 )}
                             </AnimatePresence>
@@ -328,7 +328,7 @@ export default function CurrencyTransfer({
                                             ease: [0.22, 1, 0.36, 1],
                                         }}
                                     >
-                                        Transaction ID: {transactionId}
+                                        {mode === "request" ? `Request ID: ${transactionId ?? "-"}` : `Transaction ID: ${transactionId}`}
                                     </motion.div>
                                 ) : (
                                     <motion.div
@@ -342,7 +342,7 @@ export default function CurrencyTransfer({
                                             ease: [0.22, 1, 0.36, 1],
                                         }}
                                     >
-                                        Processing Transaction...
+                                        {mode === "request" ? "Processing Request..." : "Processing Transaction..."}
                                     </motion.div>
                                 )}
                             </AnimatePresence>
@@ -516,7 +516,7 @@ export default function CurrencyTransfer({
                                                 ease: [0.22, 1, 0.36, 1],
                                             }}
                                         >
-                                            Payment Confirmed
+                                            {mode === "request" ? "Request Sent" : "Payment Confirmed"}
                                         </motion.span>
                                     ) : (
                                         <motion.span
@@ -529,7 +529,7 @@ export default function CurrencyTransfer({
                                                 ease: [0.22, 1, 0.36, 1],
                                             }}
                                         >
-                                            Confirming Payment Status
+                                            {mode === "request" ? "Confirming Request Status" : "Confirming Payment Status"}
                                         </motion.span>
                                     )}
                                 </AnimatePresence>
